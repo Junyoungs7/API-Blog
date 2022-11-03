@@ -18,11 +18,12 @@ public class WeatherApiService {
         String base_time = "0500";
         String  nx = "55";
         String ny = "127";
+
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_URL);
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         WebClient webClient = WebClient.builder().uriBuilderFactory(factory).baseUrl(BASE_URL).build();
 
-        String response = webClient.get()
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("serviceKey", serviceKey)
                         .queryParam("pageNo", pageNo)
@@ -36,8 +37,6 @@ public class WeatherApiService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
-        return response;
     }
 
 }
