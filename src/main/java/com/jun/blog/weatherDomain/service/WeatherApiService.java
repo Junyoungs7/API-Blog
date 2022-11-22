@@ -1,5 +1,6 @@
 package com.jun.blog.weatherDomain.service;
 
+import com.jun.blog.weatherDomain.dto.RegionWeatherRequestDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -10,14 +11,11 @@ public class WeatherApiService {
     @Value("${weather-apikey}")
     String serviceKey;
     String BASE_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-    public String getApi(){
-        String pageNo = "1";
-        String numOfRows = "1000";
-        String dataType = "JSON";
-        String base_date = "20221103";
-        String base_time = "0500";
-        String  nx = "55";
-        String ny = "127";
+    String pageNo = "1"; //fixed
+    String numOfRows = "290"; //fixed
+    String dataType = "JSON"; //fixed
+    String base_time = "2300"; //fixed
+    public String getApi(String base_date, String nx, String ny){
 
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_URL);
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
@@ -37,6 +35,21 @@ public class WeatherApiService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+    public String testApi(){
+        String base_date = "20221122";
+        String nx = "55";
+        String ny = "127";
+        return getApi(base_date, nx, ny);
+    }
+
+    public String regionWeatherApi(RegionWeatherRequestDTO requestDTO){
+        String base_date = requestDTO.getBase_date();
+        String nx = requestDTO.getNx();
+        String ny = requestDTO.getNy();
+
+        return getApi(base_date, nx, ny);
+
     }
 
 }
