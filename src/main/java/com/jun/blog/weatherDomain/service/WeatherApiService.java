@@ -1,6 +1,9 @@
 package com.jun.blog.weatherDomain.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jun.blog.weatherDomain.dto.RegionWeatherRequestDTO;
+import com.jun.blog.weatherDomain.dto.RegionWeatherResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,13 +18,15 @@ public class WeatherApiService {
     String numOfRows = "290"; //fixed
     String dataType = "JSON"; //fixed
     String base_time = "2300"; //fixed
-    public String getApi(String base_date, String nx, String ny){
+    public RegionWeatherResponseDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
 
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_URL);
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         WebClient webClient = WebClient.builder().uriBuilderFactory(factory).baseUrl(BASE_URL).build();
 
-        return webClient.get()
+        String result = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("serviceKey", serviceKey)
                         .queryParam("pageNo", pageNo)
@@ -35,15 +40,16 @@ public class WeatherApiService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+        return mapper.readValue(result, RegionWeatherResponseDTO.class);
     }
-    public String testApi(){
+    public RegionWeatherResponseDTO testApi() throws JsonProcessingException {
         String base_date = "20221122";
         String nx = "55";
         String ny = "127";
         return getApi(base_date, nx, ny);
     }
 
-    public String regionWeatherApi(RegionWeatherRequestDTO requestDTO){
+    public RegionWeatherResponseDTO regionWeatherApi(RegionWeatherRequestDTO requestDTO) throws JsonProcessingException {
         String base_date = requestDTO.getBase_date();
         String nx = requestDTO.getNx();
         String ny = requestDTO.getNy();
