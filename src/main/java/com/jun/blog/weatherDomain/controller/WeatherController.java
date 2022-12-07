@@ -1,10 +1,12 @@
 package com.jun.blog.weatherDomain.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jun.blog.weatherDomain.dto.ItemDTO;
-import com.jun.blog.weatherDomain.dto.RegionWeatherRequestDTO;
-import com.jun.blog.weatherDomain.dto.RegionWeatherResponseDTO;
-import com.jun.blog.weatherDomain.dto.WeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.daydto.ItemDTO;
+import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
+import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
+import com.jun.blog.weatherDomain.dto.daydto.WeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherRequestDTO;
 import com.jun.blog.weatherDomain.service.WeatherApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,5 +44,20 @@ public class WeatherController {
             throw new RuntimeException(e);
         }
     }
+
+    @PostMapping("/weeks")
+    public ResponseEntity<?> weeksWeather(@RequestBody WeeksWeatherRequestDTO requestDTO){
+        try{
+            WeeksWeatherApiDTO responseDTO = weatherApiService.weeksWeatherApi(requestDTO);
+            log.info("response = {}", responseDTO);
+            return ResponseEntity.ok().body(responseDTO.getResponse().getBody().getItems().getItem());
+        }catch (NullPointerException e){
+            log.error("지역 날씨 요청 에러",e);
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

@@ -1,11 +1,11 @@
-package com.jun.blog.weatherDomain.dto;
+package com.jun.blog.weatherDomain.dto.weeksdto;
 
 import lombok.Getter;
 
 @Getter
-public class BodyDTO {
+public class WeeksBodyDTO {
     private String dataType;
-    private ItemsDTO items;
+    private WeeksItemsDTO items;
     private String pageNo;
     private String numOfRows;
     private String totalCount;

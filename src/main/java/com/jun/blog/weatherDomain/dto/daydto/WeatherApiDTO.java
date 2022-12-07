@@ -1,4 +1,4 @@
-package com.jun.blog.weatherDomain.dto;
+package com.jun.blog.weatherDomain.dto.daydto;
 
 import lombok.*;
 

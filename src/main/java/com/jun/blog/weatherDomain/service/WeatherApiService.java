@@ -2,10 +2,12 @@ package com.jun.blog.weatherDomain.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jun.blog.weatherDomain.dto.ItemDTO;
-import com.jun.blog.weatherDomain.dto.RegionWeatherRequestDTO;
-import com.jun.blog.weatherDomain.dto.RegionWeatherResponseDTO;
-import com.jun.blog.weatherDomain.dto.WeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.daydto.ItemDTO;
+import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
+import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
+import com.jun.blog.weatherDomain.dto.daydto.WeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,14 +25,16 @@ public class WeatherApiService {
     @Value("${weather-apikey}")
     String serviceKey;
     String BASE_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+    String BASE_WEEKS_URL = "http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa";
     String pageNo = "1"; //fixed
     String numOfRows = "544"; //fixed
     String dataType = "JSON"; //fixed
     String base_time = "0200"; //fixed
+
+    String tmFc = "202212070600";
     public WeatherApiDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
-
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_URL);
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         WebClient webClient = WebClient.builder().uriBuilderFactory(factory).baseUrl(BASE_URL).build();
@@ -50,6 +54,8 @@ public class WeatherApiService {
                 .bodyToMono(String.class)
                 .block();
         return mapper.readValue(result, WeatherApiDTO.class);
+
+
     }
     public WeatherApiDTO testApi() throws JsonProcessingException {
         LocalDate now = LocalDate.now();
@@ -83,7 +89,32 @@ public class WeatherApiService {
         }
 
         return RegionWeatherResponseDTO.builder().temperatureMinMax(temperatureMinMax).temperaturePerHour(temperaturePerHour).build();
-
     }
+
+    public WeeksWeatherApiDTO weeksWeatherApi(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_WEEKS_URL);
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
+        WebClient webClient = WebClient.builder().uriBuilderFactory(factory).baseUrl(BASE_WEEKS_URL).build();
+
+        String result = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("serviceKey", serviceKey)
+                        .queryParam("pageNo", pageNo)
+                        .queryParam("numOfRows", "10")
+                        .queryParam("dataType", dataType)
+                        .queryParam("regId", requestDTO.getRegId())
+                        .queryParam("tmFc", tmFc)
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        return mapper.readValue(result, WeeksWeatherApiDTO.class);
+    }
+
+
+
+
 
 }
