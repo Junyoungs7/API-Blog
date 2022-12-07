@@ -2,23 +2,32 @@ package com.jun.blog.weatherDomain.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jun.blog.weatherDomain.dto.ItemDTO;
 import com.jun.blog.weatherDomain.dto.RegionWeatherRequestDTO;
 import com.jun.blog.weatherDomain.dto.RegionWeatherResponseDTO;
+import com.jun.blog.weatherDomain.dto.WeatherApiDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
+@Slf4j
 public class WeatherApiService {
     @Value("${weather-apikey}")
     String serviceKey;
     String BASE_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
     String pageNo = "1"; //fixed
-    String numOfRows = "290"; //fixed
+    String numOfRows = "544"; //fixed
     String dataType = "JSON"; //fixed
-    String base_time = "2300"; //fixed
-    public RegionWeatherResponseDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
+    String base_time = "0200"; //fixed
+    public WeatherApiDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -40,12 +49,19 @@ public class WeatherApiService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-        return mapper.readValue(result, RegionWeatherResponseDTO.class);
+        return mapper.readValue(result, WeatherApiDTO.class);
     }
-    public RegionWeatherResponseDTO testApi() throws JsonProcessingException {
-        String base_date = "20221122";
-        String nx = "55";
-        String ny = "127";
+    public WeatherApiDTO testApi() throws JsonProcessingException {
+        LocalDate now = LocalDate.now();
+
+        // 포맷 정의
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        // 포맷 적용
+        String base_date = now.format(formatter);
+        log.info("base data = {}", base_date);
+        String nx = "60";
+        String ny = "120";
         return getApi(base_date, nx, ny);
     }
 
@@ -53,8 +69,20 @@ public class WeatherApiService {
         String base_date = requestDTO.getBase_date();
         String nx = requestDTO.getNx();
         String ny = requestDTO.getNy();
+        WeatherApiDTO weatherApiDTO = getApi(base_date, nx, ny);
+        List<ItemDTO> itemDTOS = weatherApiDTO.getResponse().getBody().getItems().getItem();
+        List<ItemDTO> temperaturePerHour = new ArrayList<>();
+        List<ItemDTO> temperatureMinMax = new ArrayList<>();
 
-        return getApi(base_date, nx, ny);
+        for(ItemDTO itemDTO : itemDTOS){
+            if (itemDTO.getCategory().equals("TMP")) {
+                temperaturePerHour.add(itemDTO);
+            } else if (itemDTO.getCategory().equals("TMN") || itemDTO.getCategory().equals("TMX")) {
+                temperatureMinMax.add(itemDTO);
+            }
+        }
+
+        return RegionWeatherResponseDTO.builder().temperatureMinMax(temperatureMinMax).temperaturePerHour(temperaturePerHour).build();
 
     }
 

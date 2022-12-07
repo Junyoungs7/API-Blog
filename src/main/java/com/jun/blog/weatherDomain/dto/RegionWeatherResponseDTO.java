@@ -1,13 +1,15 @@
 package com.jun.blog.weatherDomain.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
+@Builder
 @Getter
-@Setter
 @ToString
 public class RegionWeatherResponseDTO {
-
-    private ResponseDTO response;
+    private List<ItemDTO> temperaturePerHour;
+    private List<ItemDTO> temperatureMinMax;
 }
