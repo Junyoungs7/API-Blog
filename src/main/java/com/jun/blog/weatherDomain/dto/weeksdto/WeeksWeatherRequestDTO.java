@@ -6,5 +6,5 @@ import lombok.ToString;
 @Getter
 @ToString
 public class WeeksWeatherRequestDTO {
-    private String regId;
+    private String city;
 }

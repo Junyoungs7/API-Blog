@@ -10,6 +10,7 @@ import com.jun.blog.weatherDomain.dto.weeksdto.WeeksItemDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksMinMaxDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherApiDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherRequestDTO;
+import com.jun.blog.weatherDomain.model.WeatherCodeEntity;
 import com.jun.blog.weatherDomain.repository.WeatherCodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class WeatherApiService {
     String numOfRows = "544"; //fixed
     String dataType = "JSON"; //fixed
     String base_time = "0200"; //fixed
+
+    private final WeatherCodeRepository weatherCodeRepository;
 
     public WeatherApiDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
 
@@ -96,6 +99,10 @@ public class WeatherApiService {
     }
 
     public WeeksMinMaxDTO weeksWeatherApi(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
+
+        log.info(requestDTO.getCity());
+        WeatherCodeEntity weatherCodeEntity = weatherCodeRepository.findByCity(requestDTO.getCity());
+
         ObjectMapper mapper = new ObjectMapper();
 
         //현재보다 하루 전 날짜로 검색
@@ -114,7 +121,7 @@ public class WeatherApiService {
                         .queryParam("pageNo", pageNo)
                         .queryParam("numOfRows", "10")
                         .queryParam("dataType", dataType)
-                        .queryParam("regId", requestDTO.getRegId())
+                        .queryParam("regId", weatherCodeEntity.getCode())
                         .queryParam("tmFc", tmFc)
                         .build())
                 .retrieve()
