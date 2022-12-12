@@ -53,7 +53,7 @@ public class WeatherApiController {
             return ResponseEntity.ok().body(responseDTO);
         }catch (NullPointerException e){
             log.error("지역 날씨 요청 에러",e);
-            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("지역을 다시 입력해주세요.", HttpStatus.BAD_REQUEST);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
