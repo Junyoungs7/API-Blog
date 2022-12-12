@@ -23,14 +23,6 @@ import java.util.List;
 public class WeatherApiController {
     private final WeatherApiService weatherApiService;
 
-    @GetMapping("/weathers")
-    @ResponseBody
-    public List<ItemDTO> getWeather() throws JsonProcessingException {
-        log.info("responseDTO = {}", weatherApiService.testApi().getResponse().getBody().getItems().getItem().toString());
-        List<ItemDTO> itemDTOS = weatherApiService.testApi().getResponse().getBody().getItems().getItem();
-        return itemDTOS;
-    }
-
     @PostMapping("/weathers")
     public ResponseEntity<?> regionWeather(@RequestBody RegionWeatherRequestDTO requestDTO){
         try{

@@ -64,19 +64,6 @@ public class WeatherApiService {
 
 
     }
-    public WeatherApiDTO testApi() throws JsonProcessingException {
-        LocalDate now = LocalDate.now();
-
-        // 포맷 정의
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-        // 포맷 적용
-        String base_date = now.format(formatter);
-        log.info("base data = {}", base_date);
-        String nx = "60";
-        String ny = "120";
-        return getApi(base_date, nx, ny);
-    }
 
     public RegionWeatherResponseDTO regionWeatherApi(RegionWeatherRequestDTO requestDTO) throws JsonProcessingException {
         String base_date = requestDTO.getBase_date();
