@@ -6,8 +6,12 @@ import com.jun.blog.weatherDomain.dto.daydto.ItemDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
 import com.jun.blog.weatherDomain.dto.daydto.WeatherApiDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.WeeksItemDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.WeeksMinMaxDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherApiDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherRequestDTO;
+import com.jun.blog.weatherDomain.repository.WeatherCodeRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WeatherApiService {
     @Value("${weather-apikey}")
     String serviceKey;
@@ -31,7 +36,6 @@ public class WeatherApiService {
     String dataType = "JSON"; //fixed
     String base_time = "0200"; //fixed
 
-    String tmFc = "202212070600";
     public WeatherApiDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -91,8 +95,15 @@ public class WeatherApiService {
         return RegionWeatherResponseDTO.builder().temperatureMinMax(temperatureMinMax).temperaturePerHour(temperaturePerHour).build();
     }
 
-    public WeeksWeatherApiDTO weeksWeatherApi(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
+    public WeeksMinMaxDTO weeksWeatherApi(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
+
+        //현재보다 하루 전 날짜로 검색
+        LocalDate now = LocalDate.now();
+        LocalDate yesterday = now.minusDays(1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String tmFc = yesterday.format(formatter)+"0600";
+
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_WEEKS_URL);
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         WebClient webClient = WebClient.builder().uriBuilderFactory(factory).baseUrl(BASE_WEEKS_URL).build();
@@ -110,11 +121,27 @@ public class WeatherApiService {
                 .bodyToMono(String.class)
                 .block();
 
-        return mapper.readValue(result, WeeksWeatherApiDTO.class);
+        //최저/최고 온도만 뽑기
+        WeeksWeatherApiDTO weeksWeatherApiDTO = mapper.readValue(result, WeeksWeatherApiDTO.class);
+        WeeksItemDTO weeksItemDTO = weeksWeatherApiDTO.getResponse().getBody().getItems().getItem().get(0);
+        return WeeksMinMaxDTO.builder()
+                .taMin3(weeksItemDTO.getTaMin3())
+                .taMax3(weeksItemDTO.getTaMax3())
+                .taMin4(weeksItemDTO.getTaMin4())
+                .taMax4(weeksItemDTO.getTaMax4())
+                .taMin5(weeksItemDTO.getTaMin5())
+                .taMax5(weeksItemDTO.getTaMax5())
+                .taMin6(weeksItemDTO.getTaMin6())
+                .taMax6(weeksItemDTO.getTaMax6())
+                .taMin7(weeksItemDTO.getTaMin7())
+                .taMax7(weeksItemDTO.getTaMax7())
+                .taMin8(weeksItemDTO.getTaMin8())
+                .taMax8(weeksItemDTO.getTaMax8())
+                .taMin9(weeksItemDTO.getTaMin9())
+                .taMax9(weeksItemDTO.getTaMax9())
+                .taMin10(weeksItemDTO.getTaMin10())
+                .taMax10(weeksItemDTO.getTaMax10())
+                .build();
     }
-
-
-
-
 
 }
