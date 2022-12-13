@@ -1,9 +1,6 @@
 package com.jun.blog.weatherDomain.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,6 +9,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @Table(name = "weatherlocation")
+@Getter
 public class WeatherLocatinEntity {
 
     @Id

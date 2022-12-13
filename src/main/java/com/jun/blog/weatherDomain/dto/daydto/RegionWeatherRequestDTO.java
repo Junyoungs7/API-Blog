@@ -1,8 +1,10 @@
 package com.jun.blog.weatherDomain.dto.daydto;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class RegionWeatherRequestDTO {
 
     private String nx;

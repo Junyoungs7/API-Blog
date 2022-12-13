@@ -2,13 +2,17 @@ package com.jun.blog.weatherDomain.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jun.blog.weatherDomain.dto.RegionRequestDTO;
+import com.jun.blog.weatherDomain.dto.TodayCheckDTO;
 import com.jun.blog.weatherDomain.dto.daydto.ItemDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
 import com.jun.blog.weatherDomain.dto.daydto.WeatherApiDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.*;
 import com.jun.blog.weatherDomain.model.WeatherCodeEntity;
+import com.jun.blog.weatherDomain.model.WeatherLocatinEntity;
 import com.jun.blog.weatherDomain.repository.WeatherCodeRepository;
+import com.jun.blog.weatherDomain.repository.WeatherLocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +26,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WeatherApiService {
+public class WeatherService {
     @Value("${weather-apikey}")
     String serviceKey;
     String BASE_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
@@ -38,6 +41,7 @@ public class WeatherApiService {
     String base_time = "0200"; //fixed
 
     private final WeatherCodeRepository weatherCodeRepository;
+    private final WeatherLocationRepository weatherLocationRepository;
 
     public WeatherApiDTO getApi(String base_date, String nx, String ny) throws JsonProcessingException {
 
@@ -61,15 +65,30 @@ public class WeatherApiService {
                 .bodyToMono(String.class)
                 .block();
         return mapper.readValue(result, WeatherApiDTO.class);
-
-
     }
 
-    public RegionWeatherResponseDTO regionWeatherApi(RegionWeatherRequestDTO requestDTO) throws JsonProcessingException {
-        String base_date = requestDTO.getBase_date();
-        String nx = requestDTO.getNx();
-        String ny = requestDTO.getNy();
-        WeatherApiDTO weatherApiDTO = getApi(base_date, nx, ny);
+    public RegionWeatherRequestDTO checkRegionLocation(RegionRequestDTO requestDTO){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();
+        String day = "";
+        int hour = time.getHour();
+        if (hour < 2) {
+            LocalDate yesterday = date.minusDays(1);
+            day = yesterday.format(formatter);
+        }
+        String city3 = "";
+        WeatherLocatinEntity weatherLocatinEntity = weatherLocationRepository.findByCity1AndCity2AndCity3(requestDTO.getCity1(), requestDTO.getCity2(), city3);
+        return RegionWeatherRequestDTO.builder()
+                .nx(weatherLocatinEntity.getX())
+                .ny(weatherLocatinEntity.getY())
+                .base_date(day)
+                .build();
+    }
+
+    public RegionWeatherResponseDTO regionWeatherApi(RegionRequestDTO requestDTO) throws JsonProcessingException {
+        RegionWeatherRequestDTO regionWeatherRequestDTO = checkRegionLocation(requestDTO);
+        WeatherApiDTO weatherApiDTO = getApi(regionWeatherRequestDTO.getBase_date(), regionWeatherRequestDTO.getNx(), regionWeatherRequestDTO.getNy());
         List<ItemDTO> itemDTOS = weatherApiDTO.getResponse().getBody().getItems().getItem();
         List<ItemDTO> temperaturePerHour = new ArrayList<>();
         List<ItemDTO> temperatureMinMax = new ArrayList<>();

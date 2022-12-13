@@ -1,4 +1,4 @@
-package com.jun.blog.weatherDomain.service;
+package com.jun.blog.weatherDomain.dto;
 
 import lombok.Builder;
 import lombok.Getter;

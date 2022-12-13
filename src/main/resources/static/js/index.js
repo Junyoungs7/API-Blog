@@ -13,8 +13,11 @@ var main = {
     },
     save : function (){
         var data = {
-            city: $('#city').val()
+            city1: $('#addressKindU').val(),
+            city2: $('#addressKindD').val()
         };
+        alert($('#addressKindU').val(),$('#addressKindD').val());
+        console.log($('#addressKindU').val(),$('#addressKindD').val());
 
         $.ajax({
             type: 'POST',

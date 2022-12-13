@@ -1,32 +1,28 @@
 package com.jun.blog.weatherDomain.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jun.blog.weatherDomain.dto.daydto.ItemDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksMinMaxDTO;
-import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherApiDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherRequestDTO;
-import com.jun.blog.weatherDomain.service.WeatherApiService;
+import com.jun.blog.weatherDomain.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/weather")
 public class WeatherApiController {
-    private final WeatherApiService weatherApiService;
+    private final WeatherService weatherService;
 
     @PostMapping("/weathers")
     public ResponseEntity<?> regionWeather(@RequestBody RegionWeatherRequestDTO requestDTO){
         try{
-            RegionWeatherResponseDTO responseDTO = weatherApiService.regionWeatherApi(requestDTO);
+            RegionWeatherResponseDTO responseDTO = weatherService.regionWeatherApi(requestDTO);
             log.info("response = {} {}", responseDTO.getTemperaturePerHour(), responseDTO.getTemperatureMinMax());
             return ResponseEntity.ok().body(responseDTO);
         }catch (NullPointerException e){
@@ -41,7 +37,7 @@ public class WeatherApiController {
     public ResponseEntity<?> weeksWeather(@RequestBody WeeksWeatherRequestDTO requestDTO){
         log.info("requestDto = {}", requestDTO.getCity());
         try{
-            WeeksMinMaxDTO responseDTO = weatherApiService.weeksWeatherApi(requestDTO);
+            WeeksMinMaxDTO responseDTO = weatherService.weeksWeatherApi(requestDTO);
             log.info("response = {}", responseDTO);
             return ResponseEntity.ok().body(responseDTO);
         }catch (NullPointerException e){
