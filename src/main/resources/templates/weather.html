@@ -9,28 +9,53 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="page-header">
-                    <h1 id="forms">일주일 최고/최저 온도</h1>
+                    <h1 id="forms" th:text="|${name == null ? '' : name} 일주일 최고/최저 온도|">일주일 최고/최저 온도</h1>
                 </div>
             </div>
         </div>
+        <div class="row">
+            <form class="d-flex" method="post" th:object="${city}" action="/weathermain/main">
+                <div class="input-group mb-3">
+                    <input type="text" id="city" th:field="*{city}" class="form-control" placeholder="지역을 입력해주세요." aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="true">
+                    <button class="btn btn-primary" type="submit" <!--id="btn-save"-->>검색</button>
+                </div>
+            </form>
+            <table class="table table-hover">
+                <thead>
+                <tr class="table-secondary">
+                    <th scope="col">일</th>
+                    <th scope="col">최고</th>
+                    <th scope="col">최저</th>
+                </tr>
+                </thead>
+                <tbody>
 
-        <div class="col-lg-6">
-            <div class="bs-component">
-                <form>
-                    <fieldset>
-                        <div class="form-group">
-                            <label for="exampleSelect1" class="form-label mt-4">Example select</label>
-                            <select class="form-select" id="exampleSelect1">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                            </select>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
+                <tr class="" th:each="response: ${response}" th:classappend="${response.count % 2 != 0 ? '' : 'table-primary'}" >
+                    <th scope="row" th:text="|${response.day}요일|">요일</th>
+                    <td th:text="${response.max}">0</td>
+                    <td th:text="${response.min}">0</td>
+                </tr>
+                </tbody>
+            </table>
+<!--            <form>-->
+<!--                <fieldset>-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="exampleSelect1" class="form-label mt-4">Example select</label>-->
+<!--                        <select class="form-select" id="exampleSelect1">-->
+<!--                            <option>1</option>-->
+<!--                            <option>2</option>-->
+<!--                            <option>3</option>-->
+<!--                            <option>4</option>-->
+<!--                            <option>5</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                </fieldset>-->
+<!--            </form>-->
+<!--            <div class="col-lg-6">-->
+<!--                <div class="bs-component">-->
+
+<!--                </div>-->
+<!--            </div>-->
         </div>
     </div>
 </div>

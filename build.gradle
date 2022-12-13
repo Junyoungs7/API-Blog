@@ -27,7 +27,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '3.1.0'
 	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.31'
-	implementation group: 'org.json', name: 'json', version: '20220924'
+	implementation group: 'org.json', name: 'json', version: '20220924'//
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.5'
+
 	runtimeOnly 'com.h2database:h2'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -6,10 +6,7 @@ import com.jun.blog.weatherDomain.dto.daydto.ItemDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
 import com.jun.blog.weatherDomain.dto.daydto.WeatherApiDTO;
-import com.jun.blog.weatherDomain.dto.weeksdto.WeeksItemDTO;
-import com.jun.blog.weatherDomain.dto.weeksdto.WeeksMinMaxDTO;
-import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherApiDTO;
-import com.jun.blog.weatherDomain.dto.weeksdto.WeeksWeatherRequestDTO;
+import com.jun.blog.weatherDomain.dto.weeksdto.*;
 import com.jun.blog.weatherDomain.model.WeatherCodeEntity;
 import com.jun.blog.weatherDomain.repository.WeatherCodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -85,23 +85,49 @@ public class WeatherApiService {
         return RegionWeatherResponseDTO.builder().temperatureMinMax(temperatureMinMax).temperaturePerHour(temperaturePerHour).build();
     }
 
-    public WeeksMinMaxDTO weeksWeatherApi(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
-
-        log.info(requestDTO.getCity());
+    public TodayCheckDTO checkCodeAndResult(WeeksWeatherRequestDTO requestDTO){
+        //log.info(requestDTO.getCity());
         WeatherCodeEntity weatherCodeEntity = weatherCodeRepository.findByCity(requestDTO.getCity());
 
-        ObjectMapper mapper = new ObjectMapper();
 
         //현재보다 하루 전 날짜로 검색
-        LocalDate now = LocalDate.now();
-        LocalDate yesterday = now.minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String tmFc = yesterday.format(formatter)+"0600";
+        LocalDate now = LocalDate.now();
+        LocalTime timeNow = LocalTime.now();
+        String tmFc = "";
+        LocalDate data = LocalDate.now();
+        DayOfWeek day = data.getDayOfWeek();
+        int today = day.getValue();
+        String[] weeksValue = {"월", "화", "수", "목","금", "토", "일"};
+        List<String> weeks = new ArrayList<>();
+
+        int hour = timeNow.getHour();
+        if (hour < 6 && hour >= 0) {
+            LocalDate yesterday = now.minusDays(1);
+            today +=2;
+            tmFc = yesterday.format(formatter)+"1800";
+        } else if (hour >= 6 && hour < 18) {
+            tmFc = now.format(formatter) + "0600";
+            today+=3;
+        } else if(hour >= 18 && hour < 24) {
+            tmFc = now.format(formatter) + "1800";
+            today+=3;
+        }
+
+        for (int i = 1; i < 9; i++) {
+            if(today > 7){
+                today -= 7;
+            }
+            weeks.add(weeksValue[today-1]);
+            today++;
+        }
+
 
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(BASE_WEEKS_URL);
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         WebClient webClient = WebClient.builder().uriBuilderFactory(factory).baseUrl(BASE_WEEKS_URL).build();
 
+        String finalTmFc = tmFc;
         String result = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("serviceKey", serviceKey)
@@ -109,12 +135,20 @@ public class WeatherApiService {
                         .queryParam("numOfRows", "10")
                         .queryParam("dataType", dataType)
                         .queryParam("regId", weatherCodeEntity.getCode())
-                        .queryParam("tmFc", tmFc)
+                        .queryParam("tmFc", finalTmFc)
                         .build())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+        TodayCheckDTO todayCheckDTO = TodayCheckDTO.builder().result(result).weeks(weeks).build();
+        return todayCheckDTO;
+    }
 
+    public WeeksMinMaxDTO weeksWeatherApi(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
+
+        TodayCheckDTO dto = checkCodeAndResult(requestDTO);
+        String result = dto.getResult();
+        ObjectMapper mapper = new ObjectMapper();
         //최저/최고 온도만 뽑기
         WeeksWeatherApiDTO weeksWeatherApiDTO = mapper.readValue(result, WeeksWeatherApiDTO.class);
         WeeksItemDTO weeksItemDTO = weeksWeatherApiDTO.getResponse().getBody().getItems().getItem().get(0);
@@ -136,6 +170,40 @@ public class WeatherApiService {
                 .taMin10(weeksItemDTO.getTaMin10())
                 .taMax10(weeksItemDTO.getTaMax10())
                 .build();
+
+
+    }
+
+    public List<FinalMinMaxDTO> MvcService(WeeksWeatherRequestDTO requestDTO) throws JsonProcessingException {
+        TodayCheckDTO dto = checkCodeAndResult(requestDTO);
+        String result = dto.getResult();
+        List<String> weeks = dto.getWeeks();
+        ObjectMapper mapper = new ObjectMapper();
+
+
+        //최저/최고 온도만 뽑기
+        WeeksWeatherApiDTO weeksWeatherApiDTO = mapper.readValue(result, WeeksWeatherApiDTO.class);
+        WeeksItemDTO weeksItemDTO = weeksWeatherApiDTO.getResponse().getBody().getItems().getItem().get(0);
+        List<FinalMinMaxDTO> finalMinMaxDTOList = new ArrayList<>();
+
+        FinalMinMaxDTO finalMinMaxDTO3 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin3()).max(weeksItemDTO.getTaMax3()).day(weeks.get(0)).count(3).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO3);
+        FinalMinMaxDTO finalMinMaxDTO4 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin4()).max(weeksItemDTO.getTaMax4()).day(weeks.get(1)).count(4).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO4);
+        FinalMinMaxDTO finalMinMaxDTO5 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin5()).max(weeksItemDTO.getTaMax5()).day(weeks.get(2)).count(5).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO5);
+        FinalMinMaxDTO finalMinMaxDTO6 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin6()).max(weeksItemDTO.getTaMax6()).day(weeks.get(3)).count(6).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO6);
+        FinalMinMaxDTO finalMinMaxDTO7 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin7()).max(weeksItemDTO.getTaMax7()).day(weeks.get(4)).count(7).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO7);
+        FinalMinMaxDTO finalMinMaxDTO8 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin8()).max(weeksItemDTO.getTaMax8()).day(weeks.get(5)).count(8).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO8);
+        FinalMinMaxDTO finalMinMaxDTO9 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin9()).max(weeksItemDTO.getTaMax9()).day(weeks.get(6)).count(9).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO9);
+        FinalMinMaxDTO finalMinMaxDTO10 = FinalMinMaxDTO.builder().min(weeksItemDTO.getTaMin10()).max(weeksItemDTO.getTaMax10()).day(weeks.get(7)).count(10).build();
+        finalMinMaxDTOList.add(finalMinMaxDTO10);
+
+        return finalMinMaxDTOList;
     }
 
 }

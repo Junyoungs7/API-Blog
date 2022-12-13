@@ -39,6 +39,7 @@ public class WeatherApiController {
 
     @PostMapping("/weeks")
     public ResponseEntity<?> weeksWeather(@RequestBody WeeksWeatherRequestDTO requestDTO){
+        log.info("requestDto = {}", requestDTO.getCity());
         try{
             WeeksMinMaxDTO responseDTO = weatherApiService.weeksWeatherApi(requestDTO);
             log.info("response = {}", responseDTO);
