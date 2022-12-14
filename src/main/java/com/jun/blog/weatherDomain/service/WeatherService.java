@@ -76,9 +76,12 @@ public class WeatherService {
         if (hour < 2) {
             LocalDate yesterday = date.minusDays(1);
             day = yesterday.format(formatter);
+        }else{
+            day = date.format(formatter);
         }
         String city3 = "";
         WeatherLocatinEntity weatherLocatinEntity = weatherLocationRepository.findByCity1AndCity2AndCity3(requestDTO.getCity1(), requestDTO.getCity2(), city3);
+        log.info("weather = {} {} {}", weatherLocatinEntity.getX(), weatherLocatinEntity.getY(), day);
         return RegionWeatherRequestDTO.builder()
                 .nx(weatherLocatinEntity.getX())
                 .ny(weatherLocatinEntity.getY())

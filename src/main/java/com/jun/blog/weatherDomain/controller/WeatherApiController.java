@@ -1,6 +1,7 @@
 package com.jun.blog.weatherDomain.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jun.blog.weatherDomain.dto.RegionRequestDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherRequestDTO;
 import com.jun.blog.weatherDomain.dto.daydto.RegionWeatherResponseDTO;
 import com.jun.blog.weatherDomain.dto.weeksdto.WeeksMinMaxDTO;
@@ -20,7 +21,7 @@ public class WeatherApiController {
     private final WeatherService weatherService;
 
     @PostMapping("/weathers")
-    public ResponseEntity<?> regionWeather(@RequestBody RegionWeatherRequestDTO requestDTO){
+    public ResponseEntity<?> regionWeather(@RequestBody RegionRequestDTO requestDTO){
         try{
             RegionWeatherResponseDTO responseDTO = weatherService.regionWeatherApi(requestDTO);
             log.info("response = {} {}", responseDTO.getTemperaturePerHour(), responseDTO.getTemperatureMinMax());

@@ -64,70 +64,79 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="page-header">
-                    <h1 id="forms" th:text="|${name == null ? '' : name} 일주일 최고/최저 온도|">일주일 최고/최저 온도</h1>
+                    <h1 id="forms" th:text="|${name == null ? '' : name} 오늘 내일 시간당 온도|">오늘 내일 시간당 온도</h1>
                 </div>
             </div>
         </div>
         <div class="row">
-            <form class="d-flex" method="post" th:object="${city}" action="/weathermain/main">
-                <div class="input-group mb-3">
-                    <input type="text" id="city" th:field="*{city}" class="form-control" placeholder="지역을 입력해주세요." aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="true">
-                    <button class="btn btn-primary" type="submit">검색</button>
+<!--            <form class="d-flex" method="post" th:object="${city}" action="/weathermain/main">-->
+<!--                <div class="input-group mb-3">-->
+<!--                    <input type="text" id="city" th:field="*{city}" class="form-control" placeholder="지역을 입력해주세요." aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="true">-->
+<!--                    <button class="btn btn-primary" type="submit">검색</button>-->
+<!--                </div>-->
+<!--            </form>-->
+            <div class="row">
+                <form method="post" th:object="${RegionRequestDTO}" action="/weathermain/main/select">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="addressKindU" class="form-label mt-4">시/도 선택</label>
+                            <select class="form-select" id="addressKindU" th:field="*{city1}" required name="addressKindU" onchange="addressKindChange(this)">
+                                <option value="없음">주소를 선택하세요</option>
+                                <option value="서울특별시">서울특별시</option>
+                                <option value="부산광역시">부산광역시</option>
+                                <option value="대구광역시">대구광역시</option>
+                                <option value="인천광역시">인천광역시</option>
+                                <option value="광주광역시">광주광역시</option>
+                                <option value="대전광역시">대전광역시</option>
+                                <option value="울산광역시">울산광역시</option>
+                                <option value="세종특별자치시">세종특별자치시</option>
+                                <option value="경기도">경기도</option>
+                                <option value="강원도">강원도</option>
+                                <option value="충청북도">충청북도</option>
+                                <option value="충청남도">충청남도</option>
+                                <option value="전라북도">전라북도</option>
+                                <option value="전라남도">전라남도</option>
+                                <option value="경상북도">경상북도</option>
+                                <option value="경상남도">경상남도</option>
+                                <option value="제주특별자치도">제주특별자치도</option>
+                                <option value="이어도">이어도</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="addressKindD">주소 중분류</label>
+                            <select class="form-select" th:field="*{city2}" id="addressKindD" name="addressKindD" required>
+                                <option value="">선택해주세요.</option>
+                            </select>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-primary" type="submit" >검색</button>
+                </form>
+            </div>
+            <p></p>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="page-header" th:each="minmax: ${minmax}">
+                        <h5  id="minmax" th:text="|${minmax.fcstTime}시 : ${minmax.fcstValue} 도|"></h5>
+<!--                        <h3  id="min" th:text="| 최저온도 : ${minmax.category == TMN ? ${minmax.fcstValue} : ''} |"></h3>-->
+<!--                        <h3  id="max" th:text="| 최고온도 : ${minmax.category == TMX ? ${minmax.fcstValue} : ''} |"></h3>-->
+                    </div>
                 </div>
-            </form>
-<!--            <div class="row">-->
-<!--                <form method="post" th:object="${RegionRequestDTO}" action="/weathermain/main/select">-->
-<!--                    <fieldset>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="addressKindU" class="form-label mt-4">시/도 선택</label>-->
-<!--                            <select class="form-select" id="addressKindU" th:field="*{city1}" required name="addressKindU" onchange="addressKindChange(this)">-->
-<!--                                <option value="없음">주소를 선택하세요</option>-->
-<!--                                <option value="서울특별시">서울특별시</option>-->
-<!--                                <option value="부산광역시">부산광역시</option>-->
-<!--                                <option value="대구광역시">대구광역시</option>-->
-<!--                                <option value="인천광역시">인천광역시</option>-->
-<!--                                <option value="광주광역시">광주광역시</option>-->
-<!--                                <option value="대전광역시">대전광역시</option>-->
-<!--                                <option value="울산광역시">울산광역시</option>-->
-<!--                                <option value="세종특별자치시">세종특별자치시</option>-->
-<!--                                <option value="경기도">경기도</option>-->
-<!--                                <option value="강원도">강원도</option>-->
-<!--                                <option value="충청북도">충청북도</option>-->
-<!--                                <option value="충청남도">충청남도</option>-->
-<!--                                <option value="전라북도">전라북도</option>-->
-<!--                                <option value="전라남도">전라남도</option>-->
-<!--                                <option value="경상북도">경상북도</option>-->
-<!--                                <option value="경상남도">경상남도</option>-->
-<!--                                <option value="제주특별자치도">제주특별자치도</option>-->
-<!--                                <option value="이어도">이어도</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="addressKindD">주소 중분류</label>-->
-<!--                            <select class="form-select" th:field="*{city2}" id="addressKindD" name="addressKindD" required>-->
-<!--                                <option value="">선택해주세요.</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </fieldset>-->
-<!--                    <button class="btn btn-primary" type="submit" >검색</button>-->
-<!--                </form>-->
-<!--            </div>-->
-<!--            <p></p>-->
-<!--            <p></p>-->
+            </div>
+            <p></p>
             <table class="table table-hover">
                 <thead>
                 <tr class="table-secondary">
-                    <th scope="col">요일</th>
-                    <th scope="col">최고</th>
-                    <th scope="col">최저</th>
+                    <th scope="col">시</th>
+                    <th scope="col">온도</th>
+<!--                    <th scope="col">최저</th>-->
                 </tr>
                 </thead>
                 <tbody>
 
-                <tr class="" th:each="response: ${response}" th:classappend="${response.count % 2 != 0 ? '' : 'table-primary'}" >
-                    <th scope="row" th:text="|${response.day}요일|">요일</th>
-                    <td th:text="${response.max}">0</td>
-                    <td th:text="${response.min}">0</td>
+                <tr class="" th:each="response: ${response}" th:classappend="${response.fcstTime == '0000' ? 'table-primary' : ''}"  >
+                    <th scope="row" th:text="|${response.fcstTime}시|">시</th>
+                    <td th:text="${response.fcstValue}">0</td>
+<!--                    <td th:text="${response.min}">0</td>-->
                 </tr>
                 </tbody>
             </table>
