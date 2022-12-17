@@ -1,7 +1,7 @@
-package com.jun.blog.main.controller;
+package com.jun.blog.jsonInDB.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jun.blog.main.service.JsonService;
+import com.jun.blog.jsonInDB.service.JsonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/main")
-public class MainApiController {
+@RequestMapping("/json")
+public class JsonApiController {
 
     private final JsonService jsonService;
 

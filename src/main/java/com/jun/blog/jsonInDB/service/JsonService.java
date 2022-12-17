@@ -1,10 +1,10 @@
-package com.jun.blog.main.service;
+package com.jun.blog.jsonInDB.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jun.blog.main.jsonDto.CodeDTO;
-import com.jun.blog.main.jsonDto.LocationDTO;
+import com.jun.blog.jsonInDB.jsonDto.CodeDTO;
+import com.jun.blog.jsonInDB.jsonDto.LocationDTO;
 import com.jun.blog.weatherDomain.model.WeatherCodeEntity;
 import com.jun.blog.weatherDomain.model.WeatherLocatinEntity;
 import com.jun.blog.weatherDomain.repository.WeatherCodeRepository;

@@ -1,4 +1,4 @@
-package com.jun.blog.main.jsonDto;
+package com.jun.blog.jsonInDB.jsonDto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
