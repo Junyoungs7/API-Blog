@@ -26,12 +26,6 @@ public class MemberController {
         return "/user/loginForm";
     }
 
-//    @GetMapping("/login/error")
-//    public String getUserLoginError(Model model){
-//        model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요.");
-//        return "/user/loginForm";
-//    }
-
     @GetMapping("/signup")
     public String getSignup(Model model){
         MemberSignupRequestDTO memberSignupRequestDTO = new MemberSignupRequestDTO();

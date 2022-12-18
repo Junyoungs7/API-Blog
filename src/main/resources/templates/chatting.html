@@ -41,13 +41,16 @@
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossorigin="anonymous"></script>
 <!-- JQuery -->
-<script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+<script src="https://code.jquery.com/jquery-3.6.1.js"
+        integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
         crossorigin="anonymous"></script>
+
 <script th:inline="javascript">
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function () {
 
-        const username = /*[[${session.memberId}]]*/
+        const username = [[${username}]]
+            /*[[${session.memberId}]]*/
 
             // 연결끊기(해당 페이지에서는 사용하지 않음)
             // document.querySelector('#disconn').addEventListener('click', disconnect);
@@ -103,7 +106,7 @@
             for (var i = 0; i < arr.length; i++) {
                 console.log('arr[' + i + ']: ' + arr[i]);
             }
-
+            console.log("msg_data : " + data);
             console.log("cur_session: " + cur_session);
             sessionId = arr[0].trim();
             if(arr[1] === undefined) {

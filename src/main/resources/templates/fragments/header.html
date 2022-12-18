@@ -23,7 +23,7 @@
                         <a class="nav-link" th:classappend="${menu} == 'select'? 'active'" href="/weathermain/main/select">지역 날씨 선택</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" th:classappend="${menu} == 'chatting'? 'active'" href="#">실시간 채팅방</a>
+                        <a class="nav-link" th:classappend="${menu} == 'chatting'? 'active'" href="/chat/room">실시간 채팅방</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
@@ -40,7 +40,7 @@
 <!--                    <input class="form-control me-sm-2" type="text" placeholder="Search">-->
 <!--                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>-->
 <!--                </form>-->
-                <p th:text="${name}"></p>
+                <a sec:authorize="isAuthenticated()" th:text="|${username}님|"></a>
                 <button type="button" class="btn btn-outline-primary" sec:authorize="isAnonymous()" onClick="location.href='/auth/login'">로그인</button>
                 <button type="button" class="btn btn-outline-primary" sec:authorize="isAuthenticated()" onClick="location.href='/auth/logout'">로그아웃</button>
 

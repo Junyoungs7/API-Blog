@@ -13,18 +13,7 @@ public class MemberService{
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public boolean validateDuplicate(String email){
-        return memberRepository.existsByEmail(email);
-    }
-
     public void create(String email, String username, String password) throws Exception {
-//        if (validateDuplicate(email)) {
-//            throw new IllegalStateException("이미 가입된 아이디입니다.");
-//        } else {
-//            String encodePassword = passwordEncoder.encode(password);
-//            Member member = Member.builder().email(email).username(username).password(encodePassword).build();
-//            memberRepository.save(member);
-//        }
 
         String encodePassword = passwordEncoder.encode(password);
         Member member = Member.builder().email(email).username(username).password(encodePassword).build();
